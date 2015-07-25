@@ -26,6 +26,8 @@ import (
 	"os"
 
 	"github.com/GoogleCloudPlatform/kubernetes/pkg/auth/authorizer"
+
+	"github.com/golang/glog"
 )
 
 // TODO: make this into a real API object.  Note that when that happens, it
@@ -135,7 +137,10 @@ func (p policy) subjectMatches(a authorizer.Attributes) bool {
 func (pl policyList) Authorize(a authorizer.Attributes) error {
 	for _, p := range pl {
 		if p.matches(a) {
+			glog.V(2).Infof("--->TRUE, p:%v, a:%v %v %v %v", p, a.GetUserName(), a.IsReadOnly(), a.GetResource(), a.GetNamespace())
 			return nil
+		} else {
+			glog.V(2).Infof("--->False, p:%v, a:%v %v %v %v", p, a.GetUserName(), a.IsReadOnly(), a.GetResource(), a.GetNamespace())
 		}
 	}
 	return errors.New("No policy matched.")
